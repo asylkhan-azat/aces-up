@@ -11,6 +11,21 @@ public readonly struct GameState : IEquatable<GameState>
 
     public ImmutableArray<ImmutablePile> Piles { get; }
 
+    public GameState DealNewCards(Deck deck)
+    {
+        return new GameState(Piles
+            .Select(pile => pile.Push(deck.Take()))
+            .ToImmutableArray());
+    }
+
+    public static GameState CreateNew()
+    {
+        return new GameState(Enumerable
+            .Range(0, 4)
+            .Select(_ => ImmutablePile.Empty)
+            .ToImmutableArray());
+    }
+
     public bool Equals(GameState other)
     {
         for (var i = 0; i < Piles.Length; i++)
