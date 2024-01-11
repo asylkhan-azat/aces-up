@@ -18,11 +18,30 @@ public readonly struct GameState : IEquatable<GameState>
             .ToImmutableArray());
     }
 
+    public GameState RemoveLowerRankedCards()
+    {
+        var newState = TryRemoveLowerRankedCards();
+
+        if (newState.Equals(this))
+        {
+            return newState;
+        }
+
+        return newState.RemoveLowerRankedCards();
+    }
+
     public static GameState CreateNew()
     {
         return new GameState(Enumerable
             .Range(0, 4)
             .Select(_ => ImmutablePile.Empty)
+            .ToImmutableArray());
+    }
+    
+    public static GameState Create(Card[][] piles)
+    {
+        return new GameState(piles
+            .Select(ImmutablePile.Create)
             .ToImmutableArray());
     }
 
@@ -37,6 +56,36 @@ public readonly struct GameState : IEquatable<GameState>
         }
 
         return true;
+    }
+
+    private GameState TryRemoveLowerRankedCards()
+    {
+        var piles = Piles.ToArray();
+
+        for (var i = 0; i < piles.Length; i++)
+        {
+            if (piles[i].IsEmpty) continue;
+            if (ThereIsPileWithSameSuitAndHigherRank(piles[i].Peek()))
+            {
+                piles[i] = piles[i].Pop();
+            }
+        }
+
+        return new GameState(piles.ToImmutableArray());
+    }
+
+    private bool ThereIsPileWithSameSuitAndHigherRank(Card card)
+    {
+        foreach (var pile in Piles)
+        {
+            if (pile.IsEmpty) continue;
+            if (pile.Peek().Suit == card.Suit && pile.Peek().Rank > card.Rank)
+            {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     public override bool Equals(object? obj)

@@ -31,7 +31,7 @@ public sealed class GameStateTests
         // Assert
         lhs.Should().Be(rhs);
     }
-    
+
     [Fact]
     public void DealNewCards_Should_Add_Card_To_Each_Pile()
     {
@@ -52,5 +52,27 @@ public sealed class GameStateTests
         state.Piles[1].Peek().Should().Be(Rank.Three.OfClubs());
         state.Piles[2].Peek().Should().Be(Rank.Four.OfClubs());
         state.Piles[3].Peek().Should().Be(Rank.Five.OfClubs());
+    }
+
+    [Fact]
+    public void RemoveLowerRankedCards_Should_Remove_Cards_Until_There_Is_No_Cards_To_Remove()
+    {
+        // Arrange
+        var state = GameState.Create(new[]
+        {
+            new[] { Rank.Three.OfClubs() },
+            new[] { Rank.Five.OfClubs(), Rank.Six.OfClubs() },
+            new[] { Rank.Seven.OfClubs() },
+            new[] { Rank.Jack.OfClubs() },
+        });
+
+        // Act
+        state = state.RemoveLowerRankedCards();
+
+        // Assert
+        state.Piles[0].Should().BeEmpty();
+        state.Piles[1].Should().BeEmpty();
+        state.Piles[2].Should().BeEmpty();
+        state.Piles[3].Should().OnlyContain(card => card.Equals(Rank.Jack.OfClubs()));
     }
 }
