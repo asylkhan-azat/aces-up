@@ -1,41 +1,33 @@
 ﻿using AcesUp.Common;
 
-namespace AcesUp.ConsoleApp
+SimulateGamesAndPrintStatistics(10_000);
+return;
+
+static void SimulateGamesAndPrintStatistics(int games)
 {
-    internal static class Program
+    var wins = 0;
+
+    for (var i = 0; i < games; i++)
     {
-        private static void Main()
+        if (RunSimulation())
         {
-            SimulateGamesAndPrintStatistics(10_000);
-        }
-
-        private static void SimulateGamesAndPrintStatistics(int games)
-        {
-            var wins = 0;
-
-            for (var i = 0; i < games; i++)
-            {
-                if (RunSimulation())
-                {
-                    wins++;
-                }
-            }
-
-            Console.WriteLine($"Total simulations: {games}");
-            Console.WriteLine($"Won games: {wins}");
-            Console.WriteLine($"Win rate: {Math.Round(wins / (double)games * 100, 2)}%");
-        }
-
-        private static bool RunSimulation()
-        {
-            var deck = Deck.CreateShuffledDeck(Random.Shared);
-            var game = new Game();
-            while (!deck.IsEmpty)
-            {
-                game.RunAllSteps(deck);
-            }
-
-            return game.IsGameWon();
+            wins++;
         }
     }
+
+    Console.WriteLine($"Total simulations: {games}");
+    Console.WriteLine($"Won games: {wins}");
+    Console.WriteLine($"Win rate: {Math.Round(wins / (double)games * 100, 2)}%");
+}
+
+static bool RunSimulation()
+{
+    var deck = Deck.CreateShuffledDeck(Random.Shared);
+    var game = new Game();
+    while (!deck.IsEmpty)
+    {
+        game.RunAllSteps(deck);
+    }
+
+    return game.IsGameWon();
 }
