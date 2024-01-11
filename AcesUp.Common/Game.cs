@@ -2,81 +2,31 @@
 
 public class Game
 {
-    private readonly Pile[] _piles = { new(), new(), new(), new() };
+    private GameState _state = GameState.CreateNew();
 
     public void RunAllSteps(Deck deck)
     {
-        DealNewCards(deck);
-        RemoveLowerRankedCards();
-        while (AreThereMovesToEmptyPiles())
-        {
-            MoveCardToEmptyPile();
-            RemoveLowerRankedCards();
-        }
-    }
+        _state = _state.DealNewCards(deck);
 
-    private void DealNewCards(Deck deck)
-    {
-        foreach (var pile in _piles)
-        {
-            pile.Push(deck.Take());
-        }
-    }
+        var currentState = _state;
+        var newState = currentState
+            .RemoveLowerRankedCards()
+            .MoveCardsToEmptyPile();
 
-    private void RemoveLowerRankedCards()
-    {
-        while (TryRemoveOneCard())
+        while (!newState.Equals(currentState))
         {
-        }
-    }
-
-    private bool TryRemoveOneCard()
-    {
-        foreach (var pile in _piles)
-        {
-            if (pile.TryPeek(out var card) && ThereIsPileWithSameSuitAndHigherRank(card))
-            {
-                pile.Pop();
-                return true;
-            }
+            currentState = newState;
+            newState = currentState.RemoveLowerRankedCards().MoveCardsToEmptyPile();
         }
 
-        return false;
-    }
-    
-    private bool ThereIsPileWithSameSuitAndHigherRank(Card card)
-    {
-        foreach (var pile in _piles)
-        {
-            if (pile.TryPeek(out var otherCard) &&
-                otherCard.Suit == card.Suit &&
-                otherCard.Rank > card.Rank)
-            {
-                return true;
-            }
-        }
-
-        return false;
-    }
-
-    private bool AreThereMovesToEmptyPiles()
-    {
-        return _piles.Any(static pile => pile.IsEmpty) &&
-               _piles.Any(static pile => pile.Count > 1);
-    }
-
-    private void MoveCardToEmptyPile()
-    {
-        var bigEnoughPile = _piles.First(static pile => pile.Count > 1);
-        var emptyPile = _piles.First(static pile => pile.IsEmpty);
-        emptyPile.Push(bigEnoughPile.Pop());
+        _state = newState;
     }
 
     public bool IsGameWon()
     {
-        foreach (var pile in _piles)
+        foreach (var pile in _state.Piles)
         {
-            if (pile.Count != 1)
+            if (pile.Count() != 1)
             {
                 return false;
             }
@@ -94,7 +44,7 @@ public class Game
     {
         for (int i = 0; i < 4; i++)
         {
-            Console.WriteLine($"Pile {i}: {_piles[i]}");
+            Console.WriteLine($"Pile {i}: {_state.Piles[i]}");
         }
 
         Console.WriteLine();

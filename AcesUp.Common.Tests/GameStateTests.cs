@@ -13,19 +13,19 @@ public sealed class GameStateTests
         var lhs = new GameState(
             new[]
             {
-                ImmutablePile.Empty,
-                ImmutablePile.Empty.Push(Rank.Ace.OfClubs()),
-                ImmutablePile.Empty.Push(Rank.Eight.OfHearts()),
-                ImmutablePile.Empty,
+                Pile.Empty,
+                Pile.Empty.Push(Rank.Ace.OfClubs()),
+                Pile.Empty.Push(Rank.Eight.OfHearts()),
+                Pile.Empty,
             }.ToImmutableArray());
 
         var rhs = new GameState(
             new[]
             {
-                ImmutablePile.Empty,
-                ImmutablePile.Empty.Push(Rank.Ace.OfClubs()),
-                ImmutablePile.Empty.Push(Rank.Eight.OfHearts()),
-                ImmutablePile.Empty,
+                Pile.Empty,
+                Pile.Empty.Push(Rank.Ace.OfClubs()),
+                Pile.Empty.Push(Rank.Eight.OfHearts()),
+                Pile.Empty,
             }.ToImmutableArray());
 
         // Assert

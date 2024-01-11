@@ -4,12 +4,12 @@ namespace AcesUp.Common;
 
 public readonly struct GameState : IEquatable<GameState>
 {
-    public GameState(ImmutableArray<ImmutablePile> piles)
+    public GameState(ImmutableArray<Pile> piles)
     {
         Piles = piles;
     }
 
-    public ImmutableArray<ImmutablePile> Piles { get; }
+    public ImmutableArray<Pile> Piles { get; }
 
     public GameState DealNewCards(Deck deck)
     {
@@ -56,14 +56,14 @@ public readonly struct GameState : IEquatable<GameState>
     {
         return new GameState(Enumerable
             .Range(0, 4)
-            .Select(_ => ImmutablePile.Empty)
+            .Select(_ => Pile.Empty)
             .ToImmutableArray());
     }
 
     public static GameState Create(Card[][] piles)
     {
         return new GameState(piles
-            .Select(ImmutablePile.Create)
+            .Select(Pile.Create)
             .ToImmutableArray());
     }
 
