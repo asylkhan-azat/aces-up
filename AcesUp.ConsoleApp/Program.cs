@@ -4,32 +4,38 @@ namespace AcesUp.ConsoleApp
 {
     internal static class Program
     {
-        static void Main()
+        private static void Main()
         {
-            var r = new Random();
+            SimulateGamesAndPrintStatistics(10_000);
+        }
 
-            var deck = Deck.CreateShuffledDeck(r);
+        private static void SimulateGamesAndPrintStatistics(int games)
+        {
+            var wins = 0;
 
+            for (var i = 0; i < games; i++)
+            {
+                if (RunSimulation())
+                {
+                    wins++;
+                }
+            }
+
+            Console.WriteLine($"Total simulations: {games}");
+            Console.WriteLine($"Won games: {wins}");
+            Console.WriteLine($"Win rate: {Math.Round(wins / (double)games * 100, 2)}%");
+        }
+
+        private static bool RunSimulation()
+        {
+            var deck = Deck.CreateShuffledDeck(Random.Shared);
             var game = new Game();
-
-            var round = 1;
-
             while (!deck.IsEmpty)
             {
                 game.RunAllSteps(deck);
-
-                Console.WriteLine($"Content of the piles after round {round++}:");
-                game.PrintPiles();
-                Console.WriteLine();
-
             }
 
-            if (game.IsGameWon())
-            {
-                Console.WriteLine("Hooray - you won!");
-            }
-
-            Console.ReadLine();
+            return game.IsGameWon();
         }
     }
 }
