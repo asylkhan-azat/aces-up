@@ -30,6 +30,28 @@ public readonly struct GameState : IEquatable<GameState>
         return newState.RemoveLowerRankedCards();
     }
 
+    public GameState MoveCardsToEmptyPile()
+    {
+        if (!Piles.Any(p => p.IsEmpty))
+        {
+            return this;
+        }
+
+        var state = TryTakeCardFromBigPile(out var card);
+
+        if (card.HasValue)
+        {
+            state = state.AddCardToEmptyPile(card.Value);
+        }
+
+        if (state.Equals(this))
+        {
+            return state;
+        }
+
+        return state.MoveCardsToEmptyPile();
+    }
+
     public static GameState CreateNew()
     {
         return new GameState(Enumerable
@@ -37,7 +59,7 @@ public readonly struct GameState : IEquatable<GameState>
             .Select(_ => ImmutablePile.Empty)
             .ToImmutableArray());
     }
-    
+
     public static GameState Create(Card[][] piles)
     {
         return new GameState(piles
@@ -56,6 +78,41 @@ public readonly struct GameState : IEquatable<GameState>
         }
 
         return true;
+    }
+
+    private GameState TryTakeCardFromBigPile(out Card? card)
+    {
+        card = default;
+
+        var piles = Piles.ToArray();
+
+        for (var i = 0; i < piles.Length; i++)
+        {
+            if (piles[i].Count() > 1)
+            {
+                card = piles[i].Peek();
+                piles[i] = piles[i].Pop();
+                break;
+            }
+        }
+
+        return new GameState(piles.ToImmutableArray());
+    }
+
+    private GameState AddCardToEmptyPile(Card card)
+    {
+        var piles = Piles.ToArray();
+
+        for (var i = 0; i < piles.Length; i++)
+        {
+            if (piles[i].IsEmpty)
+            {
+                piles[i] = piles[i].Push(card);
+                break;
+            }
+        }
+
+        return new GameState(piles.ToImmutableArray());
     }
 
     private GameState TryRemoveLowerRankedCards()

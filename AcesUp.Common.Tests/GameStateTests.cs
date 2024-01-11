@@ -75,4 +75,23 @@ public sealed class GameStateTests
         state.Piles[2].Should().BeEmpty();
         state.Piles[3].Should().OnlyContain(card => card.Equals(Rank.Jack.OfClubs()));
     }
+
+    [Fact]
+    public void MoveCardToEmptyPile_Should_Move_Card_From_Big_Enough_Pile()
+    {
+        // Arrange
+        var state = GameState.Create(new[]
+        {
+            Array.Empty<Card>(),
+            new[] { Rank.Two.OfClubs(), Rank.Three.OfClubs(), Rank.Four.OfClubs(), Rank.Five.OfClubs() },
+            Array.Empty<Card>(),
+            Array.Empty<Card>(),
+        });
+
+        // Act
+        state = state.MoveCardsToEmptyPile();
+
+        // Assert
+        state.Piles.Should().AllSatisfy(pile => pile.Should().ContainSingle());
+    }
 }
