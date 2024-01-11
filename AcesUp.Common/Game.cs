@@ -2,7 +2,7 @@
 
 public class Game
 {
-    private readonly Pile[] _piles = new Pile[] { new(), new(), new(), new() };
+    private readonly Pile[] _piles = { new(), new(), new(), new() };
 
     public void RunAllSteps(Deck deck)
     {
@@ -17,24 +17,59 @@ public class Game
 
     private void DealNewCards(Deck deck)
     {
-        // Add code here
+        foreach (var pile in _piles)
+        {
+            pile.Push(deck.Take());
+        }
     }
 
     private void RemoveLowerRankedCards()
     {
-        // Add code here
+        while (TryRemoveOneCard())
+        {
+        }
     }
 
-    private bool AreThereMovesToEmptyPiles()
+    private bool TryRemoveOneCard()
     {
-        // Add code here
+        foreach (var pile in _piles)
+        {
+            if (pile.TryPeek(out var card) && ThereIsPileWithSameSuitAndHigherRank(card))
+            {
+                pile.Pop();
+                return true;
+            }
+        }
+
+        return false;
+    }
+    
+    private bool ThereIsPileWithSameSuitAndHigherRank(Card card)
+    {
+        foreach (var pile in _piles)
+        {
+            if (pile.TryPeek(out var otherCard) &&
+                otherCard.Suit == card.Suit &&
+                otherCard.Rank > card.Rank)
+            {
+                return true;
+            }
+        }
 
         return false;
     }
 
+    private bool AreThereMovesToEmptyPiles()
+    {
+        return _piles.Any(static pile => pile.IsEmpty) &&
+               _piles.Any(static pile => pile.Count > 1);
+    }
+
     private void MoveCardToEmptyPile()
     {
-        // Add code here
+        var bigEnoughPile = _piles.First(static pile => pile.Count > 1);
+        var emptyPile = _piles.First(static pile => pile.IsEmpty);
+        emptyPile.Push(bigEnoughPile.Pop());
     }
 
     public bool IsGameWon()
@@ -64,5 +99,4 @@ public class Game
 
         Console.WriteLine();
     }
-
 }
